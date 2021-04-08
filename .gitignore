@@ -14,12 +14,11 @@ download.sh
 #python
 attacks.py
 logger.py
-main.py
 model.py
 noise.py
 
 #folder
-data/
+data/celeba/images
 defenses/
 jpg/
 stargan_celeba_256/
