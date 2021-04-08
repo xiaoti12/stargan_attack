@@ -1,0 +1,25 @@
+#spec file
+.DS_Store
+LICENSE
+README.md
+__pycache__/
+.vscode/
+download.sh
+
+#image
+*.jpg
+*.jpeg
+*.png
+
+#python
+attacks.py
+logger.py
+main.py
+model.py
+noise.py
+
+#folder
+data/
+defenses/
+jpg/
+stargan_celeba_256/
