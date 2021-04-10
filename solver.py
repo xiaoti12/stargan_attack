@@ -971,7 +971,8 @@ class Solver(object):
 
             # Translated images.
             #x_fake_list = [x_real]
-            x_fake_list=[]
+            image_list = []
+            image_list.append(x_real)
             
             for idx, c_trg in enumerate(c_trg_list):
                 # translate picture with each attribute
@@ -1006,9 +1007,10 @@ class Solver(object):
 
                     # Add to lists
                     # x_fake_list.append(blurred_image)
-                    x_fake_list.append(x_adv)
+                    image_list.append(x_adv)
                     # x_fake_list.append(perturb)
-                    x_fake_list.append(gen_adv)
+                    image_list.append(gen_adv)
+                    image_list.append(gen_noadv)
 
                     l1_error += F.l1_loss(gen_adv, gen_noattack)
                     l2_error += F.mse_loss(gen_adv, gen_noattack)
@@ -1022,6 +1024,14 @@ class Solver(object):
             # x_concat = torch.cat(x_fake_list, dim=3)
             # result_path = os.path.join(self.result_dir, '{}-images.jpg'.format(i+1))
             # save_image(self.denorm(x_concat.data.cpu()), result_path, nrow=1, padding=0)
+            
+            name_list=['origin','adv','gen','trans']
+            
+            for image_mtx,image_name in zip(image_list,name_list):
+                concat = torch.cat([image_mtx], dim=3)
+                result_path = os.path.join(self.result_dir, image_name + '-{}.jpg'.format(i + 1))
+                save_image(self.denorm(concat.data.cpu()), result_path, nrow=1, padding=0)
+            '''
             adv_concat = torch.cat([x_adv], dim=3)
             result_path = os.path.join(self.result_dir, 'adv-{}-images.jpg'.format(i+1))
             save_image(self.denorm(adv_concat.data.cpu()), result_path, nrow=1, padding=0)
@@ -1037,6 +1047,7 @@ class Solver(object):
             origin = torch.cat([x_real], dim=3)
             result_path = os.path.join(self.result_dir, 'origin-{}-images.jpg'.format(i+1))
             save_image(self.denorm(origin.data.cpu()), result_path, nrow=1, padding=0)
+            '''
             # pdb.set_trace()
             if i == 2:
             #if i == 49:     # stop after this many images
