@@ -61,6 +61,8 @@ class Solver(object):
         # Test configurations.
         self.test_iters = config.test_iters
 
+        self.target_attr = config.target_attr
+
         # Miscellaneous.
         self.use_tensorboard = config.use_tensorboard
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -945,6 +947,12 @@ class Solver(object):
 
     def test_attack(self):
         """Vanilla or blur attacks."""
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        print("================")
+        print(os.getcwd())
+        print(self.model_save_dir)
+        print("================")
+        # exit(1)
 
         # Load the trained generator.
         self.restore_model(self.test_iters)
@@ -959,6 +967,7 @@ class Solver(object):
         l1_error, l2_error, min_dist, l0_error = 0.0, 0.0, 0.0, 0.0
         n_dist, n_samples = 0, 0
 
+        target_idx = self.selected_attrs.index(self.target_attr)
 
         for i, (x_real, c_org) in enumerate(data_loader):
             # translate each picture in the dataset
@@ -976,7 +985,7 @@ class Solver(object):
             
             for idx, c_trg in enumerate(c_trg_list):
                 # translate picture with each attribute
-                if idx != 1: #only blonde_hair attribute
+                if idx != target_idx: #only blonde_hair attribute
                     continue
                 print('image', i, 'class', idx)
                 with torch.no_grad():
@@ -1029,8 +1038,9 @@ class Solver(object):
             
             for image_mtx,image_name in zip(image_list,name_list):
                 concat = torch.cat([image_mtx], dim=3)
-                result_path = os.path.join(self.result_dir, image_name + '-{}.jpg'.format(i + 1))
+                result_path = os.path.join(self.result_dir, image_name + '-{}.jpg'.format(i))
                 save_image(self.denorm(concat.data.cpu()), result_path, nrow=1, padding=0)
+                # save_image(concat.data.cpu(),result_path,nrow=1,padding=0)
             '''
             adv_concat = torch.cat([x_adv], dim=3)
             result_path = os.path.join(self.result_dir, 'adv-{}-images.jpg'.format(i+1))

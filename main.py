@@ -100,6 +100,8 @@ if __name__ == '__main__':
     # Test configuration.
     parser.add_argument('--test_iters', type=int, default=200000, help='test model from this step')
 
+    parser.add_argument('--target_attr', type=str, default='Black_Hair', help='target attribute to be disturbed')
+
     # Miscellaneous.
     parser.add_argument('--num_workers', type=int, default=1)
     parser.add_argument('--mode', type=str, default='train', choices=['train', 'test'])
