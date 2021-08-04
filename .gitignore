@@ -11,14 +11,9 @@ download.sh
 *.jpeg
 *.png
 
-#python
-attacks.py
-logger.py
-model.py
-noise.py
+#model
+*.ckpt
+
 
 #folder
-data/celeba/images
-defenses/
-jpg/
-stargan_celeba_256/
+data/
