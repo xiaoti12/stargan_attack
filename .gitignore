@@ -1,7 +1,6 @@
 #spec file
 .DS_Store
 LICENSE
-README.md
 __pycache__/
 .vscode/
 download.sh
