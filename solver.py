@@ -969,9 +969,12 @@ class Solver(object):
 
         target_idx = self.selected_attrs.index(self.target_attr)
 
+        # 统计文件夹下已经生成的图片组数
+        img_num = len([lists for lists in os.listdir(self.result_dir) if os.path.isfile(os.path.join(self.result_dir, lists))])
+        img_num = int(img_num / 3 + 1)
+
         for i, (x_real, c_org) in enumerate(data_loader):
             # translate each picture in the dataset
-            # pdb.set_trace()
             # Prepare input images and target domain labels.
             x_real = x_real.to(self.device)
             c_trg_list = self.create_labels(c_org, self.c_dim, self.dataset, self.selected_attrs)
@@ -979,13 +982,11 @@ class Solver(object):
             pgd_attack = attacks.LinfPGDAttack(model=self.G, device=self.device, feat=None)
 
             # Translated images.
-            #x_fake_list = [x_real]
             image_list = []
-            image_list.append(x_real)
             
             for idx, c_trg in enumerate(c_trg_list):
                 # translate picture with each attribute
-                if idx != target_idx: #only blonde_hair attribute
+                if idx != target_idx: 
                     continue
                 print('image', i, 'class', idx)
                 with torch.no_grad():
@@ -1005,7 +1006,6 @@ class Solver(object):
 
                 # No attack
                 # x_adv = x_real
-
                 # x_adv = self.blur_tensor(x_adv)   # use blur
 
                 # Metrics
@@ -1015,9 +1015,7 @@ class Solver(object):
 
 
                     # Add to lists
-                    # x_fake_list.append(blurred_image)
                     image_list.append(x_adv)
-                    # x_fake_list.append(perturb)
                     image_list.append(gen_adv)
                     image_list.append(gen_noadv)
 
@@ -1030,36 +1028,18 @@ class Solver(object):
                     n_samples += 1
 
             # Save the translated images.
-            # x_concat = torch.cat(x_fake_list, dim=3)
-            # result_path = os.path.join(self.result_dir, '{}-images.jpg'.format(i+1))
-            # save_image(self.denorm(x_concat.data.cpu()), result_path, nrow=1, padding=0)
+            # 生成对抗图片、转换失败、转换成功三张图片
+            name_list=['adv','gen','trans']
+
             
-            name_list=['origin','adv','gen','trans']
-            
-            for image_mtx,image_name in zip(image_list,name_list):
+            for image_mtx,image_type in zip(image_list,name_list):
                 concat = torch.cat([image_mtx], dim=3)
-                result_path = os.path.join(self.result_dir, image_name + '-{}.jpg'.format(i))
+                result_path = os.path.join(self.result_dir,'{}-{}.jpg'.format(img_num,image_type))
                 save_image(self.denorm(concat.data.cpu()), result_path, nrow=1, padding=0)
                 # save_image(concat.data.cpu(),result_path,nrow=1,padding=0)
-            '''
-            adv_concat = torch.cat([x_adv], dim=3)
-            result_path = os.path.join(self.result_dir, 'adv-{}-images.jpg'.format(i+1))
-            save_image(self.denorm(adv_concat.data.cpu()), result_path, nrow=1, padding=0)
 
-            gen_adv_concat = torch.cat([gen_adv], dim=3)
-            result_path = os.path.join(self.result_dir, 'gen-{}-images.jpg'.format(i+1))
-            save_image(self.denorm(gen_adv_concat.data.cpu()), result_path, nrow=1, padding=0)
-
-            gen_noadv_concat = torch.cat([gen_noadv], dim=3)
-            result_path = os.path.join(self.result_dir, 'trans-{}-images.jpg'.format(i+1))
-            save_image(self.denorm(gen_noadv_concat.data.cpu()), result_path, nrow=1, padding=0)
-
-            origin = torch.cat([x_real], dim=3)
-            result_path = os.path.join(self.result_dir, 'origin-{}-images.jpg'.format(i+1))
-            save_image(self.denorm(origin.data.cpu()), result_path, nrow=1, padding=0)
-            '''
-            # pdb.set_trace()
-            if i == 2:
+            # 只读取一张图片（即数据集最后一张）并处理
+            if i == 0:
             #if i == 49:     # stop after this many images
                 break
         

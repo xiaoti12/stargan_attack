@@ -33,14 +33,15 @@ class CelebA(data.Dataset):
 
     def preprocess(self):
         """Preprocess the CelebA attribute file."""
-        #pdb.set_trace()
         lines = [line.rstrip() for line in open(self.attr_path, 'r')]
         all_attr_names = lines[1].split()
         for i, attr_name in enumerate(all_attr_names):
             self.attr2idx[attr_name] = i
             self.idx2attr[i] = attr_name
 
+        # 逆序读取数据集图片
         lines = lines[2:]
+        lines.reverse()
         #random.seed(1234)
         #random.shuffle(lines)
         for i, line in enumerate(lines):
@@ -91,7 +92,6 @@ def get_loader(image_dir, attr_path, selected_attrs, crop_size=256, image_size=1
     transform.append(T.Resize(image_size))
     transform.append(T.ToTensor())
     transform.append(T.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)))
-    # transform.append(T.Normalize(mean=(0, 0, 0), std=(1, 1, 1)))
     transform = T.Compose(transform)
 
     if dataset == 'CelebA':
